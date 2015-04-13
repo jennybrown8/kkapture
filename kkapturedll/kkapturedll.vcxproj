@@ -130,6 +130,7 @@
     <ClCompile Include="video_gdi.cpp" />
     <ClCompile Include="video_opengl.cpp" />
     <ClCompile Include="videoencoder.cpp" />
+    <ClCompile Include="x264_videoencoder.cpp" />
     <ClCompile Include="mhook-lib\mhook.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
@@ -176,6 +177,7 @@
     <ClInclude Include="video.h" />
     <ClInclude Include="videocapturetimer.h" />
     <ClInclude Include="videoencoder.h" />
+    <ClInclude Include="x264_videoencoder.h" />
     <ClInclude Include="mhook-lib\mhook.h" />
     <ClInclude Include="disasm-lib\cpu.h" />
     <ClInclude Include="disasm-lib\disasm.h" />

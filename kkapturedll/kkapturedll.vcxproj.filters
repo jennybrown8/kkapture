@@ -74,6 +74,9 @@
     <ClCompile Include="videoencoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="x264_videoencoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="mhook-lib\mhook.cpp">
       <Filter>mhook</Filter>
     </ClCompile>
@@ -131,6 +134,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="videoencoder.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="x264_videoencoder.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="mhook-lib\mhook.h">

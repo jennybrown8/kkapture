@@ -27,6 +27,7 @@
 #include "bmp_videoencoder.h"
 #include "avi_videoencoder_vfw.h"
 #include "avi_videoencoder_dshow.h"
+#include "x264_videoencoder.h"
 #include "mt_proxy_videoencoder.h"
 
 static CRITICAL_SECTION captureDataLock;
@@ -66,6 +67,10 @@ VideoEncoder *createVideoEncoder(const char *filename)
     encoder = new AVIVideoEncoderDShow(filename,frameRateScaled,frameRateDenom,params.VideoCodec,params.VideoQuality);
     break;
 #endif
+
+  case X264Encoder:
+    encoder = new X264VideoEncoder(filename,frameRateScaled,frameRateDenom,params.X264Opts);
+    break;
 
   default:
     printLog("video: encoder type not supported in this build - not writing anything.\n");

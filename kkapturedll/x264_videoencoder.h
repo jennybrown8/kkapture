@@ -22,31 +22,23 @@
 
 #pragma once
 
-#ifndef __BMP_VIDEOENCODER_H__
-#define __BMP_VIDEOENCODER_H__
+#ifndef __X264_VIDEOENCODER_H__
+#define __X264_VIDEOENCODER_H__
 
-#include "videoencoder.h"
+#include "bmp_videoencoder.h"
 
-class BMPVideoEncoder : public VideoEncoder
+class X264VideoEncoder : public BMPVideoEncoder
 {
-  struct Internal;
-  Internal *intn;
+  int fpsNum, fpsDenom;
+  char opts[256];
 
-protected:
-  int frame;
-  char prefix[384];
-  int xRes,yRes;
+  HANDLE hProcess;
+  HANDLE hStream;
 
 public:
-  BMPVideoEncoder(const char *fileName);
-  virtual ~BMPVideoEncoder();
-
-  virtual void SetSize(int xRes,int yRes);
+  X264VideoEncoder(const char *fileName, int fpsNum, int fpsDenom, const char *opts);
+  virtual ~X264VideoEncoder();
   virtual void WriteFrame(const unsigned char *buffer);
-
-  virtual void SetAudioFormat(const tWAVEFORMATEX *fmt);
-  virtual tWAVEFORMATEX *GetAudioFormat();
-  virtual void WriteAudioFrame(const void *buffer,int samples);
 };
 
 #endif

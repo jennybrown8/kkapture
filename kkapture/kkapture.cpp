@@ -66,11 +66,11 @@ static void SetVideoCodecInfo(HWND hWndDlg,HIC codec)
     ZeroMemory(&info,sizeof(info));
     ICGetInfo(codec,&info,sizeof(info));
 
-    _sntprintf(buffer,sizeof(buffer)/sizeof(*buffer),_T("Video codec: %S"),info.szDescription);
+    _sntprintf(buffer,sizeof(buffer)/sizeof(*buffer),_T("AVI video codec: %S"),info.szDescription);
     buffer[255] = 0;
   }
   else
-    _tcscpy(buffer,_T("Video codec: (uncompressed)"));
+    _tcscpy(buffer,_T("AVI video codec: (uncompressed)"));
 
   SetDlgItemText(hWndDlg,IDC_VIDEOCODEC,buffer);
 }
@@ -86,9 +86,25 @@ static DWORD RegQueryDWord(HKEY hk,LPCTSTR name,DWORD defValue)
   return value;
 }
 
+static void RegQueryString(HKEY hk, LPCTSTR name, TCHAR* target, DWORD targetSize, const TCHAR* defValue)
+{
+  DWORD typeCode, size = targetSize - sizeof(TCHAR);
+  if (!hk || (RegQueryValueEx(hk, name, 0, &typeCode, (LPBYTE) target, &size) != ERROR_SUCCESS) || (typeCode != REG_SZ))
+  {
+    size = strlen(defValue) * sizeof(TCHAR);  // we assume that the default value is short enough to fit into target!
+    memcpy(target, defValue, size);
+  }
+  target[size / sizeof(TCHAR)] = '\0';
+}
+
 static void RegSetDWord(HKEY hk,LPCTSTR name,DWORD value)
 {
   RegSetValueEx(hk,name,0,REG_DWORD,(LPBYTE) &value,sizeof(DWORD));
+}
+
+static void RegSetString(HKEY hk,LPCTSTR name,TCHAR* value)
+{
+  RegSetValueEx(hk,name,0,REG_SZ,(LPBYTE) &value[0],(strlen(value) + 1) * sizeof(TCHAR));
 }
 
 static void LoadSettingsFromRegistry()
@@ -103,6 +119,7 @@ static void LoadSettingsFromRegistry()
   Params.Encoder = (EncoderType) RegQueryDWord(hk,_T("VideoEncoder"),AVIEncoderVFW);
   Params.VideoCodec = RegQueryDWord(hk,_T("AVIVideoCodec"),mmioFOURCC('D','I','B',' '));
   Params.VideoQuality = RegQueryDWord(hk,_T("AVIVideoQuality"),ICQUALITY_DEFAULT);
+  RegQueryString(hk,_T("x264Opts"),&Params.X264Opts[0],X264OPTS_LENGTH,_T("--crf 18 --level 4.1 --preset veryslow"));
   Params.NewIntercept = TRUE; // always use new interception now.
   Params.SoundsysInterception = RegQueryDWord(hk,_T("SoundsysInterception"),1);
   Params.EnableAutoSkip = RegQueryDWord(hk,_T("EnableAutoSkip"),0);
@@ -131,6 +148,7 @@ static void SaveSettingsToRegistry()
     RegSetDWord(hk,_T("VideoEncoder"),Params.Encoder);
     RegSetDWord(hk,_T("AVIVideoCodec"),Params.VideoCodec);
     RegSetDWord(hk,_T("AVIVideoQuality"),Params.VideoQuality);
+    RegSetString(hk,_T("X264Opts"),Params.X264Opts);
     RegSetDWord(hk,_T("NewIntercept"),Params.NewIntercept);
     RegSetDWord(hk,_T("SoundsysInterception"),Params.SoundsysInterception);
     RegSetDWord(hk,_T("EnableAutoSkip"),Params.EnableAutoSkip);
@@ -294,10 +312,15 @@ static INT_PTR CALLBACK MainDialogProc(HWND hWndDlg,UINT uMsg,WPARAM wParam,LPAR
       SendDlgItemMessage(hWndDlg,IDC_ENCODER,CB_ADDSTRING,0,(LPARAM) ".BMP/.WAV writer");
       SendDlgItemMessage(hWndDlg,IDC_ENCODER,CB_ADDSTRING,0,(LPARAM) ".AVI (VfW, segmented)");
       SendDlgItemMessage(hWndDlg,IDC_ENCODER,CB_ADDSTRING,0,(LPARAM) ".AVI (DirectShow, *unstable*)");
+      SendDlgItemMessage(hWndDlg,IDC_ENCODER,CB_ADDSTRING,0,(LPARAM) "use x264.exe + write .WAV");
       SendDlgItemMessage(hWndDlg,IDC_ENCODER,CB_SETCURSEL,Params.Encoder - 1,0);
 
-      EnableDlgItem(hWndDlg,IDC_VIDEOCODEC,Params.Encoder != BMPEncoder);
-      EnableDlgItem(hWndDlg,IDC_VCPICK,Params.Encoder != BMPEncoder);
+      EnableDlgItem(hWndDlg,IDC_VIDEOCODEC,(Params.Encoder != BMPEncoder) && (Params.Encoder != X264Encoder));
+      EnableDlgItem(hWndDlg,IDC_VCPICK,(Params.Encoder != BMPEncoder) && (Params.Encoder != X264Encoder));
+      EnableDlgItem(hWndDlg,IDC_X264LABEL,Params.Encoder == X264Encoder);
+      EnableDlgItem(hWndDlg,IDC_X264OPTS,Params.Encoder == X264Encoder);
+
+      SetDlgItemText(hWndDlg,IDC_X264OPTS,Params.X264Opts);
 
       CheckDlgButton(hWndDlg,IDC_AUTOSKIP_TIMER,Params.FrequentTimerCheck ? BST_CHECKED : BST_UNCHECKED);
 
@@ -357,6 +380,7 @@ static INT_PTR CALLBACK MainDialogProc(HWND hWndDlg,UINT uMsg,WPARAM wParam,LPAR
         GetDlgItemText(hWndDlg,IDC_DEMO,ExeName,_MAX_PATH);
         GetDlgItemText(hWndDlg,IDC_ARGUMENTS,Arguments,MAX_ARGS);
         GetDlgItemText(hWndDlg,IDC_TARGET,Params.FileName,_MAX_PATH);
+        GetDlgItemText(hWndDlg,IDC_X264OPTS,Params.X264Opts,X264OPTS_LENGTH);
         GetDlgItemText(hWndDlg,IDC_FRAMERATE,frameRateStr,sizeof(frameRateStr)/sizeof(*frameRateStr));
         GetDlgItemText(hWndDlg,IDC_FIRSTFRAMETIMEOUT,firstFrameTimeout,sizeof(firstFrameTimeout)/sizeof(*firstFrameTimeout));
         GetDlgItemText(hWndDlg,IDC_OTHERFRAMETIMEOUT,otherFrameTimeout,sizeof(otherFrameTimeout)/sizeof(*otherFrameTimeout));
@@ -472,11 +496,13 @@ static INT_PTR CALLBACK MainDialogProc(HWND hWndDlg,UINT uMsg,WPARAM wParam,LPAR
     case IDC_ENCODER:
       if(HIWORD(wParam) == CBN_SELCHANGE)
       {
-        LRESULT selection = SendDlgItemMessage(hWndDlg,IDC_ENCODER,CB_GETCURSEL,0,0);
-        BOOL allowCodecSelect = selection != 0;
-
+        EncoderType enc = (EncoderType)(SendDlgItemMessage(hWndDlg,IDC_ENCODER,CB_GETCURSEL,0,0) + 1);
+        BOOL allowCodecSelect = (enc != BMPEncoder) && (enc != X264Encoder);
         EnableDlgItem(hWndDlg,IDC_VIDEOCODEC,allowCodecSelect);
         EnableDlgItem(hWndDlg,IDC_VCPICK,allowCodecSelect);
+        allowCodecSelect = (enc == X264Encoder);
+        EnableDlgItem(hWndDlg,IDC_X264LABEL,allowCodecSelect);
+        EnableDlgItem(hWndDlg,IDC_X264OPTS,allowCodecSelect);
       }
       return TRUE;
 

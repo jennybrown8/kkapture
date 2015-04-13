@@ -40,3 +40,4 @@
 #include "sound.h"
 #include "timing.h"
 #include "util.h"
+#include "intercept.h"

@@ -36,6 +36,9 @@ enum ErrorCodes
   ERR_COULDNT_EXECUTE
 };
 
+extern BOOL (__stdcall *Real_CreateProcessA)(LPCSTR appName,LPSTR cmdLine,LPSECURITY_ATTRIBUTES processAttr,LPSECURITY_ATTRIBUTES threadAttr,BOOL inheritHandles,DWORD flags,LPVOID env,LPCSTR currentDir,LPSTARTUPINFOA startupInfo,LPPROCESS_INFORMATION processInfo);
+extern BOOL (__stdcall *Real_CreateProcessW)(LPCWSTR appName,LPWSTR cmdLine,LPSECURITY_ATTRIBUTES processAttr,LPSECURITY_ATTRIBUTES threadAttr,BOOL inheritHandles,DWORD flags,LPVOID env,LPCWSTR currentDir,LPSTARTUPINFOW startupInfo,LPPROCESS_INFORMATION processInfo);
+
 extern "C" DLLEXPORT int CreateInstrumentedProcessA(LPCSTR appName,LPSTR cmdLine,
   LPSECURITY_ATTRIBUTES processAttr,LPSECURITY_ATTRIBUTES threadAttr,BOOL inheritHandles,DWORD flags,
   LPVOID env,LPCSTR currentDir,LPSTARTUPINFO startupInfo,LPPROCESS_INFORMATION pi);

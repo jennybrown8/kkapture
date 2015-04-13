@@ -32,6 +32,8 @@
 #define IDC_EXTRASCREENWIDTH            1031
 #define IDC_EXTRASCREENHEIGHT           1032
 #define IDC_EXTRASCREENX                1033
+#define IDC_X264LABEL                   1034
+#define IDC_X264OPTS                    1035
 
 // Next default values for new objects
 // 

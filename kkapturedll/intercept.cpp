@@ -56,8 +56,8 @@ static void __cdecl WaitProcessThreadProc(void *arg)
   WaitForSingleObject((HANDLE) arg,INFINITE);
 }
 
-static BOOL (__stdcall *Real_CreateProcessA)(LPCSTR appName,LPSTR cmdLine,LPSECURITY_ATTRIBUTES processAttr,LPSECURITY_ATTRIBUTES threadAttr,BOOL inheritHandles,DWORD flags,LPVOID env,LPCSTR currentDir,LPSTARTUPINFOA startupInfo,LPPROCESS_INFORMATION processInfo) = CreateProcessA;
-static BOOL (__stdcall *Real_CreateProcessW)(LPCWSTR appName,LPWSTR cmdLine,LPSECURITY_ATTRIBUTES processAttr,LPSECURITY_ATTRIBUTES threadAttr,BOOL inheritHandles,DWORD flags,LPVOID env,LPCWSTR currentDir,LPSTARTUPINFOW startupInfo,LPPROCESS_INFORMATION processInfo) = CreateProcessW;
+BOOL (__stdcall *Real_CreateProcessA)(LPCSTR appName,LPSTR cmdLine,LPSECURITY_ATTRIBUTES processAttr,LPSECURITY_ATTRIBUTES threadAttr,BOOL inheritHandles,DWORD flags,LPVOID env,LPCSTR currentDir,LPSTARTUPINFOA startupInfo,LPPROCESS_INFORMATION processInfo) = CreateProcessA;
+BOOL (__stdcall *Real_CreateProcessW)(LPCWSTR appName,LPWSTR cmdLine,LPSECURITY_ATTRIBUTES processAttr,LPSECURITY_ATTRIBUTES threadAttr,BOOL inheritHandles,DWORD flags,LPVOID env,LPCWSTR currentDir,LPSTARTUPINFOW startupInfo,LPPROCESS_INFORMATION processInfo) = CreateProcessW;
 
 static BOOL __stdcall Mine_CreateProcessA(LPCSTR appName,LPSTR cmdLine,LPSECURITY_ATTRIBUTES processAttr,
   LPSECURITY_ATTRIBUTES threadAttr,BOOL inheritHandles,DWORD flags,LPVOID env,LPCSTR currentDir,

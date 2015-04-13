@@ -37,7 +37,10 @@ extern bool exitNextFrame;
 extern void *hModule;
 
 // parameter block submitted by main app
-static const int PARAMVERSION = 6;
+static const int PARAMVERSION = 7;
+
+// length of x264 option string
+#define X264OPTS_LENGTH 256
 
 enum EncoderType
 {
@@ -45,6 +48,7 @@ enum EncoderType
   BMPEncoder,
   AVIEncoderVFW,
   AVIEncoderDShow,
+  X264Encoder,
 };
 
 struct ParameterBlock
@@ -55,6 +59,7 @@ struct ParameterBlock
   EncoderType Encoder;
   DWORD VideoCodec;
   DWORD VideoQuality;
+  TCHAR X264Opts[X264OPTS_LENGTH];
 
   BOOL CaptureVideo;
   BOOL CaptureAudio;

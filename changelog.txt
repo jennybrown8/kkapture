@@ -1,3 +1,6 @@
+version 1.02-kj:
+* added direct x264 capture (requires x264.exe to be in the PATH, and a user that knows how its command line arguments work)
+
 version 1.02:
 * added "fake additional screen resolution" option (thanks KeyJ)
 * switched from (long defunct) detours 1.5 to free mhook-2.2 (http://codefromthe70s.org/mhook22.aspx).
