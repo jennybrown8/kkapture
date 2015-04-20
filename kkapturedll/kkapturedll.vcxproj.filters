@@ -74,9 +74,6 @@
     <ClCompile Include="videoencoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="x264_videoencoder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="mhook-lib\mhook.cpp">
       <Filter>mhook</Filter>
     </ClCompile>
@@ -91,6 +88,9 @@
     </ClCompile>
     <ClCompile Include="disasm-lib\misc.c">
       <Filter>tdisasm</Filter>
+    </ClCompile>
+    <ClCompile Include="x264_videoencoder.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -136,9 +136,6 @@
     <ClInclude Include="videoencoder.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="x264_videoencoder.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="mhook-lib\mhook.h">
       <Filter>mhook</Filter>
     </ClInclude>
@@ -156,6 +153,9 @@
     </ClInclude>
     <ClInclude Include="disasm-lib\misc.h">
       <Filter>tdisasm</Filter>
+    </ClInclude>
+    <ClInclude Include="x264_videoencoder.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

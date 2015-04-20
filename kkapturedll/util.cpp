@@ -133,6 +133,7 @@ template<> bool UnhookFunction(void **target)
 
 DWORD UMulDiv(DWORD a,DWORD b,DWORD c)
 {
+#ifdef _M_IX86
   __asm
   {
     mov   eax, [a];
@@ -140,12 +141,15 @@ DWORD UMulDiv(DWORD a,DWORD b,DWORD c)
     div   [c];
     mov   [a], eax;
   }
-
   return a;
+#else
+  return (DWORD)(((ULONGLONG)a * (ULONGLONG)b) / (ULONGLONG)c);
+#endif
 }
 
 ULONGLONG ULongMulDiv(ULONGLONG a,DWORD b,DWORD c)
 {
+#ifdef _M_IX86
   __asm
   {
     mov   eax, dword ptr [a+4];
@@ -165,8 +169,14 @@ ULONGLONG ULongMulDiv(ULONGLONG a,DWORD b,DWORD c)
     div   [c];                  // low divide
     mov   dword ptr [a], eax;
   }
-
   return a;
+#else
+  ULONGLONG mlo = (a & 0xFFFFFFFFull) * (ULONGLONG)b;
+  ULONGLONG mhi = (a >> 32) * (ULONGLONG)b + (mlo >> 32);
+  ULONGLONG dhi = mhi / (ULONGLONG)c;
+  ULONGLONG dlo = (((mhi % (ULONGLONG)c) << 32) + (mlo & 0xFFFFFFFFull)) / (ULONGLONG)c;
+  return (dhi << 32) + dlo;
+#endif
 }
 
 // ---- really misc stuff

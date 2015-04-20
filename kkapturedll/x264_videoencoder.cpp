@@ -83,7 +83,7 @@ void X264VideoEncoder::WriteFrame(const unsigned char *buffer)
                 "x264 --demuxer raw --input-csp bgr --input-res %dx%d --fps %d/%d %s -o \"%s.264\" -",
                 xRes, yRes, fpsNum, fpsDenom, opts, prefix);
     printLog("x264: command line: %s\n", temp);
-    WriteFile(hLogFile, (LPCVOID)&temp[0], strlen(temp), &dwDummy, NULL);
+    WriteFile(hLogFile, (LPCVOID)&temp[0], (DWORD)strlen(temp), &dwDummy, NULL);
     WriteFile(hLogFile, (LPCVOID)&eol[0], 2, &dwDummy, NULL);
 
     // create the x264 process

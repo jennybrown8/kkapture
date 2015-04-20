@@ -28,7 +28,11 @@ class VideoEncoder;
 // configuration options
 
 // writing AVIs using DShow (please read top of avi_videoencoder_dshow.cpp)
-#define USE_DSHOW_AVI_WRITER      1
+#ifdef _M_X64
+  #define USE_DSHOW_AVI_WRITER  0  // no DirectShow on x64 yet (until somebody creates handy .lib files for that)
+#else
+  #define USE_DSHOW_AVI_WRITER  1
+#endif
 
 // global variables
 extern VideoEncoder *encoder;

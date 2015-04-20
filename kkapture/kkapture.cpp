@@ -91,7 +91,7 @@ static void RegQueryString(HKEY hk, LPCTSTR name, TCHAR* target, DWORD targetSiz
   DWORD typeCode, size = targetSize - sizeof(TCHAR);
   if (!hk || (RegQueryValueEx(hk, name, 0, &typeCode, (LPBYTE) target, &size) != ERROR_SUCCESS) || (typeCode != REG_SZ))
   {
-    size = strlen(defValue) * sizeof(TCHAR);  // we assume that the default value is short enough to fit into target!
+    size = (DWORD)strlen(defValue) * sizeof(TCHAR);  // we assume that the default value is short enough to fit into target!
     memcpy(target, defValue, size);
   }
   target[size / sizeof(TCHAR)] = '\0';
@@ -104,7 +104,7 @@ static void RegSetDWord(HKEY hk,LPCTSTR name,DWORD value)
 
 static void RegSetString(HKEY hk,LPCTSTR name,TCHAR* value)
 {
-  RegSetValueEx(hk,name,0,REG_SZ,(LPBYTE) &value[0],(strlen(value) + 1) * sizeof(TCHAR));
+  RegSetValueEx(hk,name,0,REG_SZ,(LPBYTE) &value[0],((DWORD)strlen(value) + 1) * sizeof(TCHAR));
 }
 
 static void LoadSettingsFromRegistry()
@@ -419,6 +419,10 @@ static INT_PTR CALLBACK MainDialogProc(HWND hWndDlg,UINT uMsg,WPARAM wParam,LPAR
         Params.FrameRateNum = frameRateNum;
         Params.FrameRateDenom = frameRateDenom;
         Params.Encoder = (EncoderType) (1 + SendDlgItemMessage(hWndDlg,IDC_ENCODER,CB_GETCURSEL,0,0));
+        #if !USE_DSHOW_AVI_WRITER
+          if (Params.Encoder == AVIEncoderDShow)
+            return !ErrorMsg(_T("DirectShow encoding is not supported in this version."),hWndDlg);
+        #endif
 
         Params.CaptureVideo = IsDlgButtonChecked(hWndDlg,IDC_VCAPTURE) == BST_CHECKED;
         Params.CaptureAudio = IsDlgButtonChecked(hWndDlg,IDC_ACAPTURE) == BST_CHECKED;

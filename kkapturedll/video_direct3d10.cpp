@@ -57,7 +57,7 @@ static bool grabFrameD3D10(IDXGISwapChain *swap)
   desc.CPUAccessFlags = D3D10_CPU_ACCESS_READ;
   desc.MiscFlags = 0;
 
-  if(FAILED(device->CreateTexture2D(&desc,0,&captureTex)))
+  if(!device || FAILED(device->CreateTexture2D(&desc,0,&captureTex)))
     printLog("video/d3d10: couldn't create staging texture for gpu->cpu download!\n");
   else
     setCaptureResolution(desc.Width,desc.Height);

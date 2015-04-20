@@ -102,7 +102,7 @@ void videoStartNextPart(bool autoSize)
   char fileName[_MAX_PATH],baseName[_MAX_PATH];
   strcpy_s(baseName,params.FileName);
 
-  for(int i=strlen(baseName)-1;i>=0;i--)
+  for(int i=(int)strlen(baseName)-1;i>=0;i--)
   {
     if(baseName[i] == '/' || baseName[i] == '\\')
       break;
@@ -232,8 +232,8 @@ void skipFrame()
 
 static void blit32to24loop(unsigned char *dest,unsigned char *src,int count)
 {
+#ifdef _M_IX86
   static const unsigned __int64 mask = 0x00ffffff00ffffff;
-
   __asm
   {
     pxor      mm7, mm7;
@@ -305,6 +305,16 @@ tailloop:
 end:
     emms;
   }
+#else
+  for(int x=count; x; --x)
+  {
+    dest[0] = src[0];
+    dest[1] = src[1];
+    dest[2] = src[2];
+    dest += 3;
+    src += 4;
+  }
+#endif
 }
 
 void blitAndFlipBGRAToCaptureData(unsigned char *source,unsigned pitch)

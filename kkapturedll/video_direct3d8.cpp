@@ -25,6 +25,8 @@
 #include "videoencoder.h"
 #include "videocapturetimer.h"
 
+#ifndef _M_X64
+
 #include "d3d8.h"
 #pragma comment(lib,"d3d8.lib")
 
@@ -249,3 +251,11 @@ void initVideo_Direct3D8()
   firstCreate = true;
   HookFunction(&Real_Direct3DCreate8,Mine_Direct3DCreate8);
 }
+
+#else
+
+void initVideo_Direct3D8()
+{
+}
+
+#endif

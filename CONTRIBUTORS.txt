@@ -10,12 +10,12 @@ MAINTAINER:
   http://www.farbrausch.de/~fg
   
 CONTRIBUTORS:
-  Tammo "kb" Hinrichs               Parts of the D3D8 code in v0.02
-  Bernhard "bartman" Wodok          AVI splitting, resolution bugfix in v0.04
-  Joern "manx" Heusipp              waveout-bugfix in v0.04
-  Iñigo "iq" Quilez                 Wrote original version of GDI capture code included in v1.00
-  Martin "KeyJ" Fiedler             Initial version of the "fake additional resolution" and x264 capture option
-  
+  Tammo "kb" Hinrichs       Parts of the D3D8 code in v0.02
+  Bernhard "bartman" Wodok  AVI splitting, resolution bugfix in v0.04
+  Joern "manx" Heusipp      waveout-bugfix in v0.04
+  Iñigo "iq" Quilez         Wrote original version of GDI capture code included in v1.00
+  Martin "KeyJ" Fiedler     additional resolutions (v1.02), x264 capture, 64-bit port
+
 ----
 
 Uses Mhook 2.2. Mhook is Copyright (c) 2007-2008, Marton Anka.

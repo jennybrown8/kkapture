@@ -1,5 +1,10 @@
 version 1.02-kj:
 * added direct x264 capture (requires x264.exe to be in the PATH, and a user that knows how its command line arguments work)
+* d3d10/11: fixed crashing bug
+* initial attempt at a 64-bit version, doesn't support DirectShow capture yet;
+  note that you need to know if the demo you're capturing is 32-bit or 64-bit, because:
+  - 32-bit kkapture can't run 64-bit demos at all
+  - 64-bit kkapture runs 32-bit demos as if they are started without kkapture
 
 version 1.02:
 * added "fake additional screen resolution" option (thanks KeyJ)
