@@ -31,6 +31,7 @@
 
 static HRESULT (__stdcall *Real_CreateDXGIFactory)(REFIID riid,void **ppFactory) = 0;
 static HRESULT (__stdcall *Real_Factory_CreateSwapChain)(IUnknown *me,IUnknown *dev,DXGI_SWAP_CHAIN_DESC *desc,IDXGISwapChain **chain) = 0;
+static HRESULT (__stdcall *Real_D3D11CreateDeviceAndSwapChain)(IDXGIAdapter *pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL *pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, IDXGISwapChain **ppSwapChain, ID3D11Device **ppDevice, D3D_FEATURE_LEVEL *pFeatureLevel, ID3D11DeviceContext **ppImmediateContext);
 static HRESULT (__stdcall *Real_SwapChain_Present)(IDXGISwapChain *me,UINT SyncInterval,UINT Flags) = 0;
 
 static bool grabFrameD3D10(IDXGISwapChain *swap)
@@ -189,9 +190,23 @@ static HRESULT __stdcall Mine_CreateDXGIFactory(REFIID riid,void **ppFactory)
   return hr;
 }
 
+static HRESULT __stdcall Mine_D3D11CreateDeviceAndSwapChain(IDXGIAdapter *pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL *pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, IDXGISwapChain **ppSwapChain, ID3D11Device **ppDevice, D3D_FEATURE_LEVEL *pFeatureLevel, ID3D11DeviceContext **ppImmediateContext)
+{
+  HRESULT hr = Real_D3D11CreateDeviceAndSwapChain(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
+  if(SUCCEEDED(hr))
+  {
+    printLog("video/d3d11: device and swap chain created.\n");
+    HookCOMOnce(&Real_SwapChain_Present, *ppSwapChain, 8, Mine_SwapChain_Present);
+  }
+  return hr;
+}
+
 void initVideo_Direct3D10()
 {
   HMODULE dxgi = LoadLibraryA("dxgi.dll");
   if(dxgi)
     HookDLLFunction(&Real_CreateDXGIFactory,dxgi,"CreateDXGIFactory",Mine_CreateDXGIFactory);
+  HMODULE d3d11 = LoadLibraryA("d3d11.dll");
+  if(d3d11)
+    HookDLLFunction(&Real_D3D11CreateDeviceAndSwapChain, d3d11, "D3D11CreateDeviceAndSwapChain", Mine_D3D11CreateDeviceAndSwapChain);
 }
