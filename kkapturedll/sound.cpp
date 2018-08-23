@@ -1415,8 +1415,9 @@ static BOOL (__stdcall *Real_BASS_GetInfo)(BASS_INFO *info) = 0;
 
 static BOOL __stdcall Mine_BASS_Init(int device,DWORD freq,DWORD flags,HWND win,GUID *clsid)
 {
-  // for BASS, all we need to do is make sure that the BASS_DEVICE_LATENCY flag is cleared.
-  return Real_BASS_Init(device,freq,flags & ~256,win,clsid);
+  // for BASS, all we need to do is make sure that the BASS_DEVICE_LATENCY flag is cleared
+  // and BASS_DEVICE_DSOUND is set (because we don't capture WASAPI yet)
+  return Real_BASS_Init(device,freq,(flags & ~256) | 0x40000,win,clsid);
 }
 
 static BOOL __stdcall Mine_BASS_GetInfo(BASS_INFO *info)
