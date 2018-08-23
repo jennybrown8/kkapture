@@ -910,7 +910,7 @@ class WaveOutImpl
   DWORD CurrentSamplePos;
   int GetPositionCounter;
 
-  void callbackMessage(UINT uMsg,DWORD dwParam1,DWORD dwParam2)
+  void callbackMessage(UINT uMsg,DWORD_PTR dwParam1,DWORD_PTR dwParam2)
   {
     switch(OpenFlags & CALLBACK_TYPEMASK)
     {
@@ -938,7 +938,7 @@ class WaveOutImpl
     {
       // mark current buffer as done and advance
       Current->dwFlags = (Current->dwFlags & ~WHDR_INQUEUE) | WHDR_DONE;
-      callbackMessage(WOM_DONE,(DWORD) Current,0);
+      callbackMessage(WOM_DONE,(DWORD_PTR) Current,0);
 
       Current = Current->lpNext;
       Head = Current;

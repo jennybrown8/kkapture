@@ -54,6 +54,10 @@
 #pragma comment(lib,"../dshow_base/strmbase_d.lib")
 #endif
 
+#if (_MSC_VER >= 1900)
+#pragma comment(lib,"legacy_stdio_definitions.lib")
+#endif
+
 // ---- dshow filters (aaargh!!)
 
 // {D4176A5A-B1CA-4c9e-A4A5-1BEDB9E281A8}
