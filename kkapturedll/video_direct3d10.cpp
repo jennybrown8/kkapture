@@ -30,6 +30,7 @@
 #include <d3d10.h>
 
 static HRESULT (__stdcall *Real_CreateDXGIFactory)(REFIID riid,void **ppFactory) = 0;
+static HRESULT (__stdcall *Real_CreateDXGIFactory1)(REFIID riid,void **ppFactory) = 0;
 static HRESULT (__stdcall *Real_Factory_CreateSwapChain)(IUnknown *me,IUnknown *dev,DXGI_SWAP_CHAIN_DESC *desc,IDXGISwapChain **chain) = 0;
 static HRESULT (__stdcall *Real_D3D11CreateDeviceAndSwapChain)(IDXGIAdapter *pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL *pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, IDXGISwapChain **ppSwapChain, ID3D11Device **ppDevice, D3D_FEATURE_LEVEL *pFeatureLevel, ID3D11DeviceContext **ppImmediateContext);
 static HRESULT (__stdcall *Real_SwapChain_Present)(IDXGISwapChain *me,UINT SyncInterval,UINT Flags) = 0;
@@ -44,6 +45,8 @@ static bool grabFrameD3D10(IDXGISwapChain *swap)
 
   D3D10_TEXTURE2D_DESC desc;
   tex->GetDevice(&device);
+  if (!device)
+    return false;  // not D3D10
   tex->GetDesc(&desc);
 
   // re-creating the capture staging texture each frame is definitely not the most efficient
@@ -58,13 +61,12 @@ static bool grabFrameD3D10(IDXGISwapChain *swap)
   desc.CPUAccessFlags = D3D10_CPU_ACCESS_READ;
   desc.MiscFlags = 0;
 
-  if(!device || FAILED(device->CreateTexture2D(&desc,0,&captureTex)))
+  if(FAILED(device->CreateTexture2D(&desc,0,&captureTex)))
     printLog("video/d3d10: couldn't create staging texture for gpu->cpu download!\n");
   else
     setCaptureResolution(desc.Width,desc.Height);
 
-  if(device)
-    device->CopySubresourceRegion(captureTex,0,0,0,0,tex,0,0);
+  device->CopySubresourceRegion(captureTex,0,0,0,0,tex,0,0);
 
   D3D10_MAPPED_TEXTURE2D mapped;
   bool grabOk = false;
@@ -104,6 +106,8 @@ static bool grabFrameD3D11(IDXGISwapChain *swap)
 
   D3D11_TEXTURE2D_DESC desc;
   tex->GetDevice(&device);
+  if (!device)
+    return false;  // not D3D11
   tex->GetDesc(&desc);
 
   // re-creating the capture staging texture each frame is definitely not the most efficient
@@ -159,7 +163,7 @@ static HRESULT __stdcall Mine_SwapChain_Present(IDXGISwapChain *me,UINT SyncInte
 
   if(params.CaptureVideo)
   {
-    if (grabFrameD3D11(me) || grabFrameD3D10(me))
+    if (grabFrameD3D10(me) || grabFrameD3D11(me))
       encoder->WriteFrame(captureData);
   }
 
@@ -181,19 +185,33 @@ static HRESULT __stdcall Mine_Factory_CreateSwapChain(IUnknown *me,IUnknown *dev
   return hr;
 }
 
+void HookDXGIFactory(REFIID riid, void *pFactory)
+{
+  if (riid == IID_IDXGIFactory)
+    HookCOMOnce(&Real_Factory_CreateSwapChain, (IUnknown *) pFactory, 10, Mine_Factory_CreateSwapChain);
+  // TODO: handle IID_IDXGIFactory2 (if that's used by a demo)
+}
+
 static HRESULT __stdcall Mine_CreateDXGIFactory(REFIID riid,void **ppFactory)
 {
   HRESULT hr = Real_CreateDXGIFactory(riid,ppFactory);
-  if(SUCCEEDED(hr) && riid == IID_IDXGIFactory)
-    HookCOMOnce(&Real_Factory_CreateSwapChain,(IUnknown *) *ppFactory,10,Mine_Factory_CreateSwapChain);
+  if(SUCCEEDED(hr))
+    HookDXGIFactory(riid, *ppFactory);
+  return hr;
+}
 
+static HRESULT __stdcall Mine_CreateDXGIFactory1(REFIID riid,void **ppFactory)
+{
+  HRESULT hr = Real_CreateDXGIFactory1(riid,ppFactory);
+  if(SUCCEEDED(hr))
+    HookDXGIFactory(riid, *ppFactory);
   return hr;
 }
 
 static HRESULT __stdcall Mine_D3D11CreateDeviceAndSwapChain(IDXGIAdapter *pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL *pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, IDXGISwapChain **ppSwapChain, ID3D11Device **ppDevice, D3D_FEATURE_LEVEL *pFeatureLevel, ID3D11DeviceContext **ppImmediateContext)
 {
   HRESULT hr = Real_D3D11CreateDeviceAndSwapChain(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
-  if(SUCCEEDED(hr))
+  if(SUCCEEDED(hr) && ppSwapChain)
   {
     printLog("video/d3d11: device and swap chain created.\n");
     HookCOMOnce(&Real_SwapChain_Present, *ppSwapChain, 8, Mine_SwapChain_Present);
@@ -205,7 +223,10 @@ void initVideo_Direct3D10()
 {
   HMODULE dxgi = LoadLibraryA("dxgi.dll");
   if(dxgi)
-    HookDLLFunction(&Real_CreateDXGIFactory,dxgi,"CreateDXGIFactory",Mine_CreateDXGIFactory);
+  {
+    HookDLLFunction(&Real_CreateDXGIFactory,  dxgi, "CreateDXGIFactory",  Mine_CreateDXGIFactory);
+    HookDLLFunction(&Real_CreateDXGIFactory1, dxgi, "CreateDXGIFactory1", Mine_CreateDXGIFactory1);
+  }
   HMODULE d3d11 = LoadLibraryA("d3d11.dll");
   if(d3d11)
     HookDLLFunction(&Real_D3D11CreateDeviceAndSwapChain, d3d11, "D3D11CreateDeviceAndSwapChain", Mine_D3D11CreateDeviceAndSwapChain);
