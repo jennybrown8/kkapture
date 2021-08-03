@@ -246,11 +246,15 @@ static void SetDefaultAVIName(HWND hWndDlg)
   // set demo .avi file name if not yet set
   TCHAR drive[_MAX_DRIVE],dir[_MAX_DIR],fname[_MAX_FNAME],ext[_MAX_EXT],path[_MAX_PATH];
   int nChars = GetDlgItemText(hWndDlg,IDC_TARGET,fname,_MAX_FNAME);
+  EncoderType enc = (EncoderType)(SendDlgItemMessage(hWndDlg,IDC_ENCODER,CB_GETCURSEL,0,0) + 1);
   if(!nChars)
   {
     GetDlgItemText(hWndDlg,IDC_DEMO,path,COUNTOF(path));
     _tsplitpath(path,drive,dir,fname,ext);
-    _tmakepath(path,drive,dir,fname,_T(".avi"));
+    if(enc == X264Encoder)
+      _tmakepath(path,drive,dir,fname,_T(".mkv"));
+    else
+      _tmakepath(path,drive,dir,fname,_T(".avi"));
     SetDlgItemText(hWndDlg,IDC_TARGET,path);
   }
 }
