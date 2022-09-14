@@ -4,9 +4,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#pragma pack(push,1)
 
 #include <windows.h>
+#pragma pack(push,1)
 #include "misc.h"
 
 ////////////////////////////////////////////////////////
