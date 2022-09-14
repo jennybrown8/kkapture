@@ -45,6 +45,7 @@ static const int PARAMVERSION = 7;
 
 // length of x264 option string
 #define X264OPTS_LENGTH 256
+#define MAX_ARGS _MAX_PATH * 2
 
 enum EncoderType
 {
@@ -58,6 +59,8 @@ enum EncoderType
 struct ParameterBlock
 {
   unsigned VersionTag;
+  TCHAR ExeName[_MAX_PATH];
+  TCHAR Arguments[MAX_ARGS];
   TCHAR FileName[_MAX_PATH];
   int FrameRateNum,FrameRateDenom;
   EncoderType Encoder;

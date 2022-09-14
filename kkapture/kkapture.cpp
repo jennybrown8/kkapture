@@ -35,11 +35,8 @@
 #define COUNTOF(x) (sizeof(x)/sizeof(*x))
 
 static const TCHAR RegistryKeyName[] = _T("Software\\Farbrausch\\kkapture");
-static const int MAX_ARGS = _MAX_PATH*2;
 
 // global vars for parameter passing (yes this sucks...)
-static TCHAR ExeName[_MAX_PATH];
-static TCHAR Arguments[MAX_ARGS];
 static ParameterBlock Params;
 
 // ---- some dialog helpers
@@ -114,6 +111,9 @@ static void LoadSettingsFromRegistry()
   if(RegOpenKeyEx(HKEY_CURRENT_USER,RegistryKeyName,0,KEY_READ,&hk) != ERROR_SUCCESS)
     hk = 0;
 
+  RegQueryString(hk,_T("ExeName"),&Params.ExeName[0],MAX_PATH,_T(""));
+  RegQueryString(hk,_T("Arguments"),&Params.Arguments[0],MAX_ARGS,_T(""));
+  RegQueryString(hk,_T("FileName"),&Params.FileName[0],MAX_PATH,_T(""));
   Params.FrameRateNum = RegQueryDWord(hk,_T("FrameRate"),6000);
   Params.FrameRateDenom = RegQueryDWord(hk,_T("FrameRateDenom"),100);
   Params.Encoder = (EncoderType) RegQueryDWord(hk,_T("VideoEncoder"),AVIEncoderVFW);
@@ -143,6 +143,9 @@ static void SaveSettingsToRegistry()
 
   if(RegCreateKeyEx(HKEY_CURRENT_USER,RegistryKeyName,0,0,0,KEY_ALL_ACCESS,0,&hk,0) == ERROR_SUCCESS)
   {
+    RegSetString(hk,_T("ExeName"),Params.ExeName);
+    RegSetString(hk,_T("Arguments"),Params.Arguments);
+    RegSetString(hk,_T("FileName"),Params.FileName);
     RegSetDWord(hk,_T("FrameRate"),Params.FrameRateNum);
     RegSetDWord(hk,_T("FrameRateDenom"),Params.FrameRateDenom);
     RegSetDWord(hk,_T("VideoEncoder"),Params.Encoder);
@@ -299,6 +302,10 @@ static INT_PTR CALLBACK MainDialogProc(HWND hWndDlg,UINT uMsg,WPARAM wParam,LPAR
       LoadSettingsFromRegistry();
 
       // set gui values
+      SetDlgItemText(hWndDlg,IDC_DEMO,Params.ExeName);
+      SetDlgItemText(hWndDlg,IDC_ARGUMENTS,Params.Arguments);
+      SetDlgItemText(hWndDlg,IDC_TARGET,Params.FileName);
+
       TCHAR buffer[32];
       FormatRational(buffer,32,Params.FrameRateNum,Params.FrameRateDenom);
       SetDlgItemText(hWndDlg,IDC_FRAMERATE,buffer);
@@ -377,8 +384,8 @@ static INT_PTR CALLBACK MainDialogProc(HWND hWndDlg,UINT uMsg,WPARAM wParam,LPAR
         Params.VersionTag = PARAMVERSION;
 
         // get values
-        GetDlgItemText(hWndDlg,IDC_DEMO,ExeName,_MAX_PATH);
-        GetDlgItemText(hWndDlg,IDC_ARGUMENTS,Arguments,MAX_ARGS);
+        GetDlgItemText(hWndDlg,IDC_DEMO, Params.ExeName,_MAX_PATH);
+        GetDlgItemText(hWndDlg,IDC_ARGUMENTS, Params.Arguments,MAX_ARGS);
         GetDlgItemText(hWndDlg,IDC_TARGET,Params.FileName,_MAX_PATH);
         GetDlgItemText(hWndDlg,IDC_X264OPTS,Params.X264Opts,X264OPTS_LENGTH);
         GetDlgItemText(hWndDlg,IDC_FRAMERATE,frameRateStr,sizeof(frameRateStr)/sizeof(*frameRateStr));
@@ -390,7 +397,7 @@ static INT_PTR CALLBACK MainDialogProc(HWND hWndDlg,UINT uMsg,WPARAM wParam,LPAR
         BOOL autoSkip = IsDlgButtonChecked(hWndDlg,IDC_AUTOSKIP) == BST_CHECKED;
 
         // validate everything and fill out parameter block
-        HANDLE hFile = CreateFile(ExeName,GENERIC_READ,0,0,OPEN_EXISTING,0,0);
+        HANDLE hFile = CreateFile(Params.ExeName,GENERIC_READ,0,0,OPEN_EXISTING,0,0);
         if(hFile == INVALID_HANDLE_VALUE)
           return !ErrorMsg(_T("You need to specify a valid executable in the 'demo' field."),hWndDlg);
         else
@@ -586,9 +593,9 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
     // prepare command line
     TCHAR commandLine[_MAX_PATH+MAX_ARGS+4];
     _tcscpy(commandLine,_T("\""));
-    _tcscat(commandLine,ExeName);
+    _tcscat(commandLine,Params.ExeName);
     _tcscat(commandLine,_T("\" "));
-    _tcscat(commandLine,Arguments);
+    _tcscat(commandLine, Params.Arguments);
 
     // create process
 	  STARTUPINFOA si;
@@ -602,12 +609,12 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
     TCHAR exepath[_MAX_PATH];
     TCHAR drive[_MAX_DRIVE],dir[_MAX_DIR],fname[_MAX_FNAME],ext[_MAX_EXT];
 
-    _tsplitpath(ExeName,drive,dir,fname,ext);
+    _tsplitpath(Params.ExeName,drive,dir,fname,ext);
     _tmakepath(exepath,drive,dir,_T(""),_T(""));
     SetCurrentDirectory(exepath);
 
     // actually start the target
-    int err = CreateInstrumentedProcessA(ExeName,commandLine,0,0,TRUE,
+    int err = CreateInstrumentedProcessA(Params.ExeName,commandLine,0,0,TRUE,
       CREATE_DEFAULT_ERROR_MODE,0,0,&si,&pi);
     switch(err)
     {
