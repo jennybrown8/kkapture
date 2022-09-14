@@ -293,7 +293,7 @@ public:
   {
     return E_NOTIMPL;
   }
-  
+
   virtual HRESULT __stdcall SetPosition(D3DVALUE x, D3DVALUE y, D3DVALUE z, DWORD dwApply)
   {
     return E_NOTIMPL;
@@ -1597,6 +1597,7 @@ static void initSoundsysFMOD3()
 static int (__stdcall *Real_System_init)(void *sys,int maxchan,int flags,void *extradriverdata);
 static int (__stdcall *Real_System_setOutput)(void *sys,int output);
 static int (__stdcall *Real_System_playSound)(void *sys,int index,void *sound,bool paused,void **channel);
+static int (__stdcall *Real_System_playSound_fmod5)(void *sys, void *sound, void *channelGroup, bool paused, void **channel);
 static int (__stdcall *Real_Channel_getFrequency)(void *chan,float *freq);
 static int (__stdcall *Real_Channel_getPosition)(void *chan,unsigned *position,int posType);
 
@@ -1612,7 +1613,7 @@ struct FMODExSoundDesc
   float frequency;
 };
 
-static const int FMODExNumSounds = 16; // max # of active (playing) sounds supported
+static const int FMODExNumSounds = 65535; // max # of active (playing) sounds supported
 static FMODExSoundDesc FMODExSounds[FMODExNumSounds];
 
 static int __stdcall Mine_System_init(void *sys,int maxchan,int flags,void *extradriverdata)
@@ -1649,6 +1650,35 @@ static int __stdcall Mine_System_playSound(void *sys,int index,void *sound,bool 
     *channel = chan;
 
   return result;
+}
+
+static int __stdcall Mine_System_playSound_fmod5(void *sys, void *sound, void *channelGroup, bool paused, void **channel)
+{
+    void* chan;
+    printLog("sound/fmod5: playSound\n");
+    int result = Real_System_playSound_fmod5(sys, sound, channelGroup, paused, &chan);
+    if (result == 0) // FMOD_OK
+    {
+      // find a free sound desc
+      int index = 0;
+      while (index < FMODExNumSounds && FMODExSounds[index].sound)
+        index++;
+
+      if (index == FMODExNumSounds)
+        printLog("sound/fmod5: more than %d sounds playing, ran out of handles.\n", FMODExNumSounds);
+      else
+      {
+        FMODExSounds[index].sound = sound;
+        FMODExSounds[index].channel = chan;
+        FMODExSounds[index].firstFrame = getFrameTiming();
+        Real_Channel_getFrequency(chan, &FMODExSounds[index].frequency);
+      }
+    }
+
+    if (channel)
+      *channel = chan;
+
+    return result;
 }
 
 static FMODExSoundDesc *FMODExSoundFromChannel(void *chan)
@@ -1689,24 +1719,42 @@ static int __stdcall Mine_Channel_getPosition(void *channel,unsigned *position,i
 static void initSoundsysFMODEx()
 {
   HMODULE fmodDll = LoadLibraryA("fmodex.dll");
-  if(fmodDll)
+  if (fmodDll && GetProcAddress(fmodDll, "FMOD_System_Init"))
   {
-    if(GetProcAddress(fmodDll,"FMOD_System_Init"))
-    {
-      MODULEINFO moduleInfo;
-      GetModuleInformation(GetCurrentProcess(),fmodDll,&moduleInfo,sizeof(moduleInfo));
+    MODULEINFO moduleInfo;
+    GetModuleInformation(GetCurrentProcess(),fmodDll,&moduleInfo,sizeof(moduleInfo));
 
-      FMODExStart = moduleInfo.lpBaseOfDll;
-      FMODExEnd = (void*) ((BYTE*) moduleInfo.lpBaseOfDll + moduleInfo.SizeOfImage);
+    FMODExStart = moduleInfo.lpBaseOfDll;
+    FMODExEnd = (void*) ((BYTE*) moduleInfo.lpBaseOfDll + moduleInfo.SizeOfImage);
 
-      printLog("sound/fmodex: fmodex.dll found, FMODEx support enabled.\n");
+    printLog("sound/fmodex: fmodex.dll found, FMODEx support enabled.\n");
 
-      HookDLLFunction(&Real_System_init,fmodDll,"?init@System@FMOD@@QAG?AW4FMOD_RESULT@@HIPAX@Z",Mine_System_init);
-      GetDLLFunction(&Real_System_setOutput,fmodDll,"?setOutput@System@FMOD@@QAG?AW4FMOD_RESULT@@W4FMOD_OUTPUTTYPE@@@Z");
-      HookDLLFunction(&Real_System_playSound,fmodDll,"?playSound@System@FMOD@@QAG?AW4FMOD_RESULT@@W4FMOD_CHANNELINDEX@@PAVSound@2@_NPAPAVChannel@2@@Z",Mine_System_playSound);
-      GetDLLFunction(&Real_Channel_getFrequency,fmodDll,"?getFrequency@Channel@FMOD@@QAG?AW4FMOD_RESULT@@PAM@Z");
-      HookDLLFunction(&Real_Channel_getPosition,fmodDll,"?getPosition@Channel@FMOD@@QAG?AW4FMOD_RESULT@@PAII@Z",Mine_Channel_getPosition);
-    }
+    HookDLLFunction(&Real_System_init,fmodDll,"?init@System@FMOD@@QAG?AW4FMOD_RESULT@@HIPAX@Z",Mine_System_init);
+    GetDLLFunction(&Real_System_setOutput,fmodDll,"?setOutput@System@FMOD@@QAG?AW4FMOD_RESULT@@W4FMOD_OUTPUTTYPE@@@Z");
+    HookDLLFunction(&Real_System_playSound,fmodDll,"?playSound@System@FMOD@@QAG?AW4FMOD_RESULT@@W4FMOD_CHANNELINDEX@@PAVSound@2@_NPAPAVChannel@2@@Z",Mine_System_playSound);
+    GetDLLFunction(&Real_Channel_getFrequency,fmodDll,"?getFrequency@Channel@FMOD@@QAG?AW4FMOD_RESULT@@PAM@Z");
+    HookDLLFunction(&Real_Channel_getPosition,fmodDll,"?getPosition@Channel@FMOD@@QAG?AW4FMOD_RESULT@@PAII@Z",Mine_Channel_getPosition);
+  }
+}
+
+static void initSoundsysFMOD5()
+{
+  HMODULE fmodDll = LoadLibraryA("fmod.dll");
+  if (fmodDll && GetProcAddress(fmodDll, "FMOD_System_Init"))
+  {
+    MODULEINFO moduleInfo;
+    GetModuleInformation(GetCurrentProcess(), fmodDll, &moduleInfo, sizeof(moduleInfo));
+
+    FMODExStart = moduleInfo.lpBaseOfDll;
+    FMODExEnd = (void*)((BYTE*)moduleInfo.lpBaseOfDll + moduleInfo.SizeOfImage);
+
+    printLog("sound/fmod5: fmod.dll found, FMOD5 support enabled.\n");
+
+    HookDLLFunction(&Real_System_init, fmodDll, "?init@System@FMOD@@QAG?AW4FMOD_RESULT@@HIPAX@Z", Mine_System_init);
+    GetDLLFunction(&Real_System_setOutput, fmodDll, "?setOutput@System@FMOD@@QAG?AW4FMOD_RESULT@@W4FMOD_OUTPUTTYPE@@@Z");
+    HookDLLFunction(&Real_System_playSound_fmod5, fmodDll, "?playSound@System@FMOD@@QAG?AW4FMOD_RESULT@@PAVSound@2@PAVChannelGroup@2@_NPAPAVChannel@2@@Z", Mine_System_playSound_fmod5);
+    GetDLLFunction(&Real_Channel_getFrequency, fmodDll, "?getFrequency@Channel@FMOD@@QAG?AW4FMOD_RESULT@@PAM@Z");
+    HookDLLFunction(&Real_Channel_getPosition, fmodDll, "?getPosition@Channel@FMOD@@QAG?AW4FMOD_RESULT@@PAII@Z", Mine_Channel_getPosition);
   }
 }
 
@@ -1737,6 +1785,7 @@ void initSound()
     initSoundsysBASS();
     initSoundsysFMOD3();
     initSoundsysFMODEx();
+    initSoundsysFMOD5();
   }
 }
 
