@@ -19,7 +19,7 @@ checked with new timing (alphabetical order):
 - borg/rez (won't capture cleanly near 60fps for some reason; you need either automatic frameskip or a different framerate)
 - candystall/pittsburgh stallers vs. loonies
 - cat's cradle/matt current
-- celeste/Extremely OK Games (require press right alt to close the game)
+- celeste/Extremely OK Games (steam version requires creating a file called steam_appid.txt with the content 504230 in your celeste folder; require press right alt to close the game)
 - chameleon/asd
 - che guevara/fairlight
 - coma (on the dancefloor)/cocoon
