@@ -30,9 +30,10 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\changelog.txt" />
-    <None Include="..\CONTRIBUTORS.txt" />
-    <None Include="..\LICENSE.txt" />
-    <None Include="..\working_demos.txt" />
+    <CopyFileToFolders Include="..\changelog.txt" />
+    <CopyFileToFolders Include="..\CONTRIBUTORS.txt" />
+    <CopyFileToFolders Include="..\LICENSE.txt" />
+    <CopyFileToFolders Include="..\README.md" />
+    <CopyFileToFolders Include="..\working_demos.txt" />
   </ItemGroup>
 </Project>

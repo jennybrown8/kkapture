@@ -76,6 +76,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>$(ProjectName)64</TargetName>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -146,6 +147,14 @@
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy "$(SolutionDir)tools\*.*" "$(TargetDir)tools" /Y /I /E</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>del $(OutDir)*.lib
+del $(OutDir)*.exp
+del $(OutDir)*.pdb</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -167,6 +176,14 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
     </Link>
+    <PostBuildEvent>
+      <Command>del $(OutDir)*.lib
+del $(OutDir)*.exp
+del $(OutDir)*.pdb</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>xcopy "$(SolutionDir)tools\*.*" "$(TargetDir)tools" /Y /I /E</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="kkapture.cpp" />
@@ -183,16 +200,11 @@
     <ResourceCompile Include="kkapture.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\changelog.txt" />
-    <None Include="..\CONTRIBUTORS.txt" />
-    <None Include="..\LICENSE.txt" />
-    <CopyFileToFolders Include="..\tools\*">
-      <DeploymentContent>false</DeploymentContent>
-      <FileType>Document</FileType>
-      <DestinationFolders>$(OutDir)tools</DestinationFolders>
-      <ExcludedFromBuild>false</ExcludedFromBuild>
-    </CopyFileToFolders>
-    <None Include="..\working_demos.txt" />
+    <CopyFileToFolders Include="..\changelog.txt" />
+    <CopyFileToFolders Include="..\CONTRIBUTORS.txt" />
+    <CopyFileToFolders Include="..\LICENSE.txt" />
+    <CopyFileToFolders Include="..\README.md" />
+    <CopyFileToFolders Include="..\working_demos.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\kkapturedll\kkapturedll.vcxproj">
