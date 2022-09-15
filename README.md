@@ -1,7 +1,7 @@
 # .kkapture
 ![screenshot](screenshot/screenshot.png)
 
-.kkapture is a small tool that produces video+audio captures of fullscreen apps (usually demos). Unlike FRaPS, it does not run in realtime; instead, it makes the demos run at a given, fixed framerate you can specify beforehand. In other words, .kkapture can make 60fps video captures of any demo your computer can run, even if each frame takes several seconds to render.
+.kkapture is a small tool that produces video+audio captures of apps (usually demos). Unlike FRaPS, it does not run in realtime; instead, it makes the demos run at a given, fixed framerate you can specify beforehand. In other words, .kkapture can make 60fps video captures of any demo your computer can run, even if each frame takes several seconds to render.
 
 ## Why would someone want this?
 For Windows demos, it is usually not much work to add a video writer to your program. However, that has to be done by the authors; the nice part about .kkapture is that it is general enough to work with a wide variety of demos, automatically. If you write demos yourself and .kkapture is able to handle your demo without problems, well, you've just saved yourself the work of coding a video writer yourself.
