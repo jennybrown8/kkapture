@@ -64,7 +64,7 @@ LRESULT CALLBACK LLKeyboardHook(int code,WPARAM wParam,LPARAM lParam)
   if(code == HC_ACTION && hook->vkCode == VK_CANCEL) // ctrl+break
     wannaExit = true;
 
-  if(code == HC_ACTION && hook->vkCode == VK_RCONTROL) // right control => try "clean" exit
+  if(code == HC_ACTION && hook->vkCode == VK_RMENU) // right alt => try "clean" exit
     exitNextFrame = true;
 
   LRESULT result = CallNextHookEx(hKeyHook,code,wParam,lParam);
