@@ -1,0 +1,1 @@
+Drag and drop the 264 file onto the bat file to merge it with the wav file into an mp4 file

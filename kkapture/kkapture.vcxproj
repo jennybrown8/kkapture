@@ -186,7 +186,7 @@
     <None Include="..\changelog.txt" />
     <None Include="..\CONTRIBUTORS.txt" />
     <None Include="..\LICENSE.txt" />
-    <CopyFileToFolders Include="..\tools\x264.exe">
+    <CopyFileToFolders Include="..\tools\*">
       <DeploymentContent>false</DeploymentContent>
       <FileType>Document</FileType>
       <DestinationFolders>$(OutDir)tools</DestinationFolders>
