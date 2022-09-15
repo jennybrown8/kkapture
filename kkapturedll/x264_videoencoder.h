@@ -31,6 +31,7 @@ class X264VideoEncoder : public BMPVideoEncoder
 {
   int fpsNum, fpsDenom;
   char opts[256];
+  char x264ExePath[MAX_PATH];
 
   HANDLE hProcess;
   HANDLE hStream;

@@ -23,6 +23,8 @@
 #include "stdafx.h"
 #include "x264_videoencoder.h"
 
+EXTERN_C IMAGE_DOS_HEADER __ImageBase;
+
 X264VideoEncoder::X264VideoEncoder(const char *fileName, int _fpsNum, int _fpsDenom, const char *_opts)
 : BMPVideoEncoder(fileName)
 {
@@ -30,6 +32,12 @@ X264VideoEncoder::X264VideoEncoder(const char *fileName, int _fpsNum, int _fpsDe
   fpsDenom = _fpsDenom;
   strncpy_s(opts, 256, _opts, _TRUNCATE);
   hProcess = hStream = 0;
+
+  TCHAR drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
+  GetModuleFileName((HINSTANCE)&__ImageBase, x264ExePath, _countof(x264ExePath));
+  _tsplitpath(x264ExePath, drive, dir, fname, ext);
+  strcat_s(dir, "tools");
+  _tmakepath(x264ExePath, drive, dir, _T("x264"), _T("exe"));
 }
 
 X264VideoEncoder::~X264VideoEncoder()
@@ -80,8 +88,8 @@ void X264VideoEncoder::WriteFrame(const unsigned char *buffer)
 
     // build the x264 command line
     _snprintf_s(temp, sizeof(temp)/sizeof(*temp),
-                "x264 --demuxer raw --input-csp bgr --input-res %dx%d --fps %d/%d %s -o \"%s.264\" -",
-                xRes, yRes, fpsNum, fpsDenom, opts, prefix);
+                "\"%s\" --demuxer raw --input-csp bgr --input-res %dx%d --fps %d/%d %s -o \"%s.264\" -",
+                x264ExePath, xRes, yRes, fpsNum, fpsDenom, opts, prefix);
     printLog("x264: command line: %s\n", temp);
     WriteFile(hLogFile, (LPCVOID)&temp[0], (DWORD)strlen(temp), &dwDummy, NULL);
     WriteFile(hLogFile, (LPCVOID)&eol[0], 2, &dwDummy, NULL);

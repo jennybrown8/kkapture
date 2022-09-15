@@ -1613,7 +1613,7 @@ struct FMODExSoundDesc
   float frequency;
 };
 
-static const int FMODExNumSounds = 65535; // max # of active (playing) sounds supported
+static const int FMODExNumSounds = 1024; // max # of active (playing) sounds supported
 static FMODExSoundDesc FMODExSounds[FMODExNumSounds];
 
 static int __stdcall Mine_System_init(void *sys,int maxchan,int flags,void *extradriverdata)

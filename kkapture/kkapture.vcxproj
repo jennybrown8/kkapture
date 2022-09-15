@@ -186,6 +186,12 @@
     <None Include="..\changelog.txt" />
     <None Include="..\CONTRIBUTORS.txt" />
     <None Include="..\LICENSE.txt" />
+    <CopyFileToFolders Include="..\tools\x264.exe">
+      <DeploymentContent>false</DeploymentContent>
+      <FileType>Document</FileType>
+      <DestinationFolders>$(OutDir)tools</DestinationFolders>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </CopyFileToFolders>
     <None Include="..\working_demos.txt" />
   </ItemGroup>
   <ItemGroup>
