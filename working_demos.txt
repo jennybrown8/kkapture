@@ -19,6 +19,7 @@ checked with new timing (alphabetical order):
 - borg/rez (won't capture cleanly near 60fps for some reason; you need either automatic frameskip or a different framerate)
 - candystall/pittsburgh stallers vs. loonies
 - cat's cradle/matt current
+- celeste/Extremely OK Games (require press right alt to close the game)
 - chameleon/asd
 - che guevara/fairlight
 - coma (on the dancefloor)/cocoon
@@ -57,7 +58,7 @@ checked with new timing (alphabetical order):
 - frameskool/equinox (use auto skip)
 - fresnel 2/kolor
 - funkkin/haujobb
-- galiwm/ümlaüt design
+- galiwm/ï¿½mlaï¿½t design
 - goatard/noice
 - heaven 7/exceed
 - hotel bar heroes/portal process
@@ -101,10 +102,10 @@ checked with new timing (alphabetical order):
 - sandbox punks/cocoon
 - sonnet/threestate (use auto skip)
 - spacecut/cncd
-- spectrum/ümlaüt design
+- spectrum/ï¿½mlaï¿½t design
 - square/pulse (win32 version)
-- structure/ümlaüt design
-- structure 2: sequence/ümlaüt design
+- structure/ï¿½mlaï¿½t design
+- structure 2: sequence/ï¿½mlaï¿½t design
 - sts-03: aeon flux/synesthetics
 - sts-04: instant zen/synesthetics
 - submerged/outracks
