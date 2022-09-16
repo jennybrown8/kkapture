@@ -38,6 +38,11 @@ If a demo doesn't work (black screen at start or at the end or nothing captured)
 If you using x264 encoder, you will get `xxx.264` and `xxx.wav` files.
 Drag and drop the `xxx.264` file onto the `tools/convert_264+wac_to_mp4.bat` file will merge it with the `xxx.wav` file and output the `xxx.mp4` file.
 
+### x264vfw
+![screenshot](screenshot/vfw264_config.png)
+If the video is stutter when using x264 encoder then I recommend using [x264vfw](https://www.videohelp.com/software/x264-VFW).
+Drag and drop the avi file onto the `tools/convert_264vfw_avi_to_mp4.bat` can convert it to mp4.
+
 ## Where can I get it?
 Latest release: https://github.com/DemoJameson/kkapture/releases
 
