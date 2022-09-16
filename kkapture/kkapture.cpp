@@ -244,22 +244,17 @@ static bool ParsePositiveRational(const TCHAR *buffer,int &num,int &denom)
     return false;
 }
 
-static void SetDefaultAVIName(HWND hWndDlg)
+static void SetTargetName(HWND hWndDlg)
 {
-  // set demo .avi file name if not yet set
   TCHAR drive[_MAX_DRIVE],dir[_MAX_DIR],fname[_MAX_FNAME],ext[_MAX_EXT],path[_MAX_PATH];
-  int nChars = GetDlgItemText(hWndDlg,IDC_TARGET,fname,_MAX_FNAME);
   EncoderType enc = (EncoderType)(SendDlgItemMessage(hWndDlg,IDC_ENCODER,CB_GETCURSEL,0,0) + 1);
-  if(!nChars)
-  {
-    GetDlgItemText(hWndDlg,IDC_DEMO,path,COUNTOF(path));
-    _tsplitpath(path,drive,dir,fname,ext);
-    if(enc == X264Encoder)
-      _tmakepath(path,drive,dir,fname,_T(".mp4"));
-    else
-      _tmakepath(path,drive,dir,fname,_T(".avi"));
-    SetDlgItemText(hWndDlg,IDC_TARGET,path);
-  }
+  GetDlgItemText(hWndDlg,IDC_DEMO,path,COUNTOF(path));
+  _tsplitpath_s(path,drive,dir,fname,ext);
+  if(enc == X264Encoder)
+    _tmakepath_s(path,drive,dir,fname,_T(".mp4"));
+  else
+    _tmakepath_s(path,drive,dir,fname,_T(".avi"));
+  SetDlgItemText(hWndDlg,IDC_TARGET,path);
 }
 
 static LRESULT CALLBACK EditBoxSubProc(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam)
@@ -276,7 +271,7 @@ static LRESULT CALLBACK EditBoxSubProc(HWND hWnd,UINT msg,WPARAM wParam,LPARAM l
     {
       SetWindowTextA(hWnd,buffer);
       if(GetWindowLongPtr(hWnd,GWLP_ID) == IDC_DEMO)
-        SetDefaultAVIName(GetParent(hWnd));
+        SetTargetName(GetParent(hWnd));
     }
     DragFinish(drop);
     return 0;
@@ -485,7 +480,7 @@ static INT_PTR CALLBACK MainDialogProc(HWND hWndDlg,UINT uMsg,WPARAM wParam,LPAR
         if(GetOpenFileName(&ofn))
         {
           SetDlgItemText(hWndDlg,IDC_DEMO,ofn.lpstrFile);
-          SetDefaultAVIName(hWndDlg);
+          SetTargetName(hWndDlg);
         }
       }
       return TRUE;
