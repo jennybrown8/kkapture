@@ -31,6 +31,9 @@
 
 #pragma comment(lib,"vfw32.lib")
 #pragma comment(lib,"msacm32.lib")
+#pragma comment(linker,"\"/manifestdependency:type='win32' \
+name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
+processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #define COUNTOF(x) (sizeof(x)/sizeof(*x))
 
@@ -246,11 +249,15 @@ static void SetDefaultAVIName(HWND hWndDlg)
   // set demo .avi file name if not yet set
   TCHAR drive[_MAX_DRIVE],dir[_MAX_DIR],fname[_MAX_FNAME],ext[_MAX_EXT],path[_MAX_PATH];
   int nChars = GetDlgItemText(hWndDlg,IDC_TARGET,fname,_MAX_FNAME);
+  EncoderType enc = (EncoderType)(SendDlgItemMessage(hWndDlg,IDC_ENCODER,CB_GETCURSEL,0,0) + 1);
   if(!nChars)
   {
     GetDlgItemText(hWndDlg,IDC_DEMO,path,COUNTOF(path));
     _tsplitpath(path,drive,dir,fname,ext);
-    _tmakepath(path,drive,dir,fname,_T(".avi"));
+    if(enc == X264Encoder)
+      _tmakepath(path,drive,dir,fname,_T(".mkv"));
+    else
+      _tmakepath(path,drive,dir,fname,_T(".avi"));
     SetDlgItemText(hWndDlg,IDC_TARGET,path);
   }
 }
@@ -487,6 +494,7 @@ static INT_PTR CALLBACK MainDialogProc(HWND hWndDlg,UINT uMsg,WPARAM wParam,LPAR
       {
         OPENFILENAME ofn;
         TCHAR filename[_MAX_PATH];
+        EncoderType enc = (EncoderType)(SendDlgItemMessage(hWndDlg,IDC_ENCODER,CB_GETCURSEL,0,0) + 1);
 
         GetDlgItemText(hWndDlg,IDC_TARGET,filename,_MAX_PATH);
 
@@ -494,7 +502,10 @@ static INT_PTR CALLBACK MainDialogProc(HWND hWndDlg,UINT uMsg,WPARAM wParam,LPAR
         ofn.lStructSize   = sizeof(ofn);
         ofn.hwndOwner     = hWndDlg;
         ofn.hInstance     = GetModuleHandle(0);
-        ofn.lpstrFilter   = _T("AVI files (*.avi)\0*.avi\0");
+        if(enc == X264Encoder)
+          ofn.lpstrFilter = _T("MKV Video (*.mkv)\0*.mkv\0");
+        else
+          ofn.lpstrFilter = _T("AVI Video (*.avi)\0*.avi\0");
         ofn.nFilterIndex  = 1;
         ofn.lpstrFile     = filename;
         ofn.nMaxFile      = sizeof(filename)/sizeof(*filename);
