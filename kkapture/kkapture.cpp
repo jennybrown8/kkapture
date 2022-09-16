@@ -122,7 +122,7 @@ static void LoadSettingsFromRegistry()
   Params.Encoder = (EncoderType) RegQueryDWord(hk,_T("VideoEncoder"),AVIEncoderVFW);
   Params.VideoCodec = RegQueryDWord(hk,_T("AVIVideoCodec"),mmioFOURCC('D','I','B',' '));
   Params.VideoQuality = RegQueryDWord(hk,_T("AVIVideoQuality"),ICQUALITY_DEFAULT);
-  RegQueryString(hk,_T("x264Opts"),&Params.X264Opts[0],X264OPTS_LENGTH,_T("--crf 18 --level 4.1 --preset veryslow"));
+  RegQueryString(hk,_T("x264Opts"),&Params.X264Opts[0],X264OPTS_LENGTH,_T("--crf 18"));
   Params.NewIntercept = TRUE; // always use new interception now.
   Params.SoundsysInterception = RegQueryDWord(hk,_T("SoundsysInterception"),1);
   Params.EnableAutoSkip = RegQueryDWord(hk,_T("EnableAutoSkip"),0);
