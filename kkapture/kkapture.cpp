@@ -255,7 +255,7 @@ static void SetDefaultAVIName(HWND hWndDlg)
     GetDlgItemText(hWndDlg,IDC_DEMO,path,COUNTOF(path));
     _tsplitpath(path,drive,dir,fname,ext);
     if(enc == X264Encoder)
-      _tmakepath(path,drive,dir,fname,_T(".mkv"));
+      _tmakepath(path,drive,dir,fname,_T(".mp4"));
     else
       _tmakepath(path,drive,dir,fname,_T(".avi"));
     SetDlgItemText(hWndDlg,IDC_TARGET,path);
@@ -503,7 +503,7 @@ static INT_PTR CALLBACK MainDialogProc(HWND hWndDlg,UINT uMsg,WPARAM wParam,LPAR
         ofn.hwndOwner     = hWndDlg;
         ofn.hInstance     = GetModuleHandle(0);
         if(enc == X264Encoder)
-          ofn.lpstrFilter = _T("MKV Video (*.mkv)\0*.mkv\0");
+          ofn.lpstrFilter = _T("MP4 Video (*.mp4)\0*.mp4\0");
         else
           ofn.lpstrFilter = _T("AVI Video (*.avi)\0*.avi\0");
         ofn.nFilterIndex  = 1;

@@ -2,9 +2,10 @@ version 1.03:
 * support FMOD5
 * save demo/arguments/target settings
 * integrated x264.exe
-* add a bat file help people convert 264+wav to mp4
+* add a bat file help people combine x264 video+wav to mp4
 * add a bat file help people convert vfw26 avi to mp4
 * "attempt clean exit" key change from right ctrl to right alt
+* change x264 extension to mp4 to fix shutter
 
 version 1.03-wip:
 * added direct x264 capture (requires x264.exe to be in the PATH, and a user that knows how its command line arguments work)

@@ -35,8 +35,8 @@ If a demo doesn't work (black screen at start or at the end or nothing captured)
 * Some demos created in that time also rely on the drawing area having a pitch of the bufferWidth * nrOfBytesPerPixel. This is not always true, as there can be a stride (empty area) at the end of each buffer line. If your image comes out somehow shifted or totally screwed up, try checking the "DDraw virtual framebuffer" option.
 
 ### x264 Encoder
-If you using x264 encoder, you will get `xxx.264` and `xxx.wav` files.
-Drag and drop the `xxx.264` file onto the `tools/convert_264+wac_to_mp4.bat` file will merge it with the `xxx.wav` file and output the `xxx.mp4` file.
+If you using x264 encoder, you will get `xxx.mp4` and `xxx.wav` files.
+Drag and drop the `xxx.mp4` file onto the `tools/combine_mp4+wac_to_mp4.bat` file will merge it with the `xxx.wav` file and output the `xxx_with_audio.mp4` file.
 
 ### x264vfw
 ![screenshot](screenshot/vfw264_config.png)
