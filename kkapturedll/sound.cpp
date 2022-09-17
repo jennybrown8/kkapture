@@ -1613,8 +1613,7 @@ struct FMODExSoundDesc
   float frequency;
 };
 
-static const int FMODExNumSounds = 65535; // max # of active (playing) sounds supported
-static FMODExSoundDesc FMODExSounds[FMODExNumSounds];
+static std::unordered_map<void*, FMODExSoundDesc> FMODExSoundDescs;
 
 static int __stdcall Mine_System_init(void *sys,int maxchan,int flags,void *extradriverdata)
 {
@@ -1630,20 +1629,12 @@ static int __stdcall Mine_System_playSound(void *sys,int index,void *sound,bool 
   int result = Real_System_playSound(sys,index,sound,paused,&chan);
   if(result == 0) // FMOD_OK
   {
-    // find a free sound desc
-    int index = 0;
-    while(index<FMODExNumSounds && FMODExSounds[index].sound)
-      index++;
-
-    if(index==FMODExNumSounds)
-      printLog("sound/fmodex: more than %d sounds playing, ran out of handles.\n",FMODExNumSounds);
-    else
-    {
-      FMODExSounds[index].sound = sound;
-      FMODExSounds[index].channel = chan;
-      FMODExSounds[index].firstFrame = getFrameTiming();
-      Real_Channel_getFrequency(chan,&FMODExSounds[index].frequency);
-    }
+    FMODExSoundDesc desc;
+    desc.sound = sound;
+    desc.channel = chan;
+    desc.firstFrame = getFrameTiming();
+    Real_Channel_getFrequency(chan, &desc.frequency);
+    FMODExSoundDescs[chan] = desc;
   }
 
   if(channel)
@@ -1654,38 +1645,28 @@ static int __stdcall Mine_System_playSound(void *sys,int index,void *sound,bool 
 
 static int __stdcall Mine_System_playSound_fmod5(void *sys, void *sound, void *channelGroup, bool paused, void **channel)
 {
-    void* chan;
-    printLog("sound/fmod5: playSound\n");
-    int result = Real_System_playSound_fmod5(sys, sound, channelGroup, paused, &chan);
-    if (result == 0) // FMOD_OK
-    {
-      // find a free sound desc
-      int index = 0;
-      while (index < FMODExNumSounds && FMODExSounds[index].sound)
-        index++;
+  void* chan;
+  int result = Real_System_playSound_fmod5(sys, sound, channelGroup, paused, &chan);
+  if (result == 0) // FMOD_OK
+  {
+    FMODExSoundDesc desc;
+    desc.sound = sound;
+    desc.channel = chan;
+    desc.firstFrame = getFrameTiming();
+    Real_Channel_getFrequency(chan, &desc.frequency);
+    FMODExSoundDescs[chan] = desc;
+  }
 
-      if (index == FMODExNumSounds)
-        printLog("sound/fmod5: more than %d sounds playing, ran out of handles.\n", FMODExNumSounds);
-      else
-      {
-        FMODExSounds[index].sound = sound;
-        FMODExSounds[index].channel = chan;
-        FMODExSounds[index].firstFrame = getFrameTiming();
-        Real_Channel_getFrequency(chan, &FMODExSounds[index].frequency);
-      }
-    }
+  if (channel)
+    *channel = chan;
 
-    if (channel)
-      *channel = chan;
-
-    return result;
+  return result;
 }
 
 static FMODExSoundDesc *FMODExSoundFromChannel(void *chan)
 {
-  for(int i=0;i<FMODExNumSounds;i++)
-    if(FMODExSounds[i].sound && FMODExSounds[i].channel == chan)
-      return &FMODExSounds[i];
+  if(FMODExSoundDescs.count(chan))
+    return &FMODExSoundDescs[chan];
 
   return 0;
 }
