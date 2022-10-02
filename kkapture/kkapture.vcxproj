@@ -102,6 +102,12 @@
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy "$(SolutionDir)tools\*.bat" "$(TargetDir)tools" /Y /I /E
+xcopy "$(SolutionDir)tools\*.exe" "$(TargetDir)tools" /Y /I /E
+xcopy "$(SolutionDir)tools\*.md" "$(TargetDir)tools" /Y /I /E
+powershell Expand-Archive "$(SolutionDir)tools\ffmpeg.zip" -DestinationPath "$(TargetDir)tools" -Force</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -124,6 +130,12 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy "$(SolutionDir)tools\*.bat" "$(TargetDir)tools" /Y /I /E
+xcopy "$(SolutionDir)tools\*.exe" "$(TargetDir)tools" /Y /I /E
+xcopy "$(SolutionDir)tools\*.md" "$(TargetDir)tools" /Y /I /E
+powershell Expand-Archive "$(SolutionDir)tools\ffmpeg.zip" -DestinationPath "$(TargetDir)tools" -Force</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -148,7 +160,10 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy "$(SolutionDir)tools\*.*" "$(TargetDir)tools" /Y /I /E</Command>
+      <Command>xcopy "$(SolutionDir)tools\*.bat" "$(TargetDir)tools" /Y /I /E
+xcopy "$(SolutionDir)tools\*.exe" "$(TargetDir)tools" /Y /I /E
+xcopy "$(SolutionDir)tools\*.md" "$(TargetDir)tools" /Y /I /E
+powershell Expand-Archive "$(SolutionDir)tools\ffmpeg.zip" -DestinationPath "$(TargetDir)tools" -Force</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>del $(OutDir)*.lib
@@ -182,7 +197,10 @@ del $(OutDir)*.exp
 del $(OutDir)*.pdb</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>xcopy "$(SolutionDir)tools\*.*" "$(TargetDir)tools" /Y /I /E</Command>
+      <Command>xcopy "$(SolutionDir)tools\*.bat" "$(TargetDir)tools" /Y /I /E
+xcopy "$(SolutionDir)tools\*.exe" "$(TargetDir)tools" /Y /I /E
+xcopy "$(SolutionDir)tools\*.md" "$(TargetDir)tools" /Y /I /E
+powershell Expand-Archive "$(SolutionDir)tools\ffmpeg.zip" -DestinationPath "$(TargetDir)tools" -Force</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

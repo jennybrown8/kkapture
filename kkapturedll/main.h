@@ -44,7 +44,7 @@ extern void *hModule;
 static const int PARAMVERSION = 7;
 
 // length of x264 option string
-#define X264OPTS_LENGTH 256
+#define ENCODER_OPTS_LENGTH 256
 #define MAX_ARGS _MAX_PATH * 2
 
 enum EncoderType
@@ -67,9 +67,9 @@ struct ParameterBlock
   EncoderType Encoder;
   DWORD VideoCodec;
   DWORD VideoQuality;
-  TCHAR X264Opts[X264OPTS_LENGTH];
-  TCHAR FFmpegInOpts[X264OPTS_LENGTH];
-  TCHAR FFmpegOutOpts[X264OPTS_LENGTH];
+  TCHAR X264Opts[ENCODER_OPTS_LENGTH];
+  TCHAR FFmpegInOpts[ENCODER_OPTS_LENGTH];
+  TCHAR FFmpegOutOpts[ENCODER_OPTS_LENGTH];
 
   BOOL CaptureVideo;
   BOOL CaptureAudio;

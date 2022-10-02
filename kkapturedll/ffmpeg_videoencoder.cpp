@@ -13,10 +13,10 @@ FFmpegVideoEncoder::FFmpegVideoEncoder(const char* fileName, int _fpsNum, int _f
     hProcess = hStream = 0;
 
     TCHAR drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
-    GetModuleFileName((HINSTANCE)&__ImageBase, x264ExePath, _countof(x264ExePath));
-    _tsplitpath(x264ExePath, drive, dir, fname, ext);
+    GetModuleFileName((HINSTANCE)&__ImageBase, ffmpegExePath, _countof(ffmpegExePath));
+    _tsplitpath(ffmpegExePath, drive, dir, fname, ext);
     strcat_s(dir, "tools");
-    _tmakepath(x264ExePath, drive, dir, _T("ffmpeg"), _T("exe"));
+    _tmakepath(ffmpegExePath, drive, dir, _T("ffmpeg"), _T("exe"));
 }
 
 FFmpegVideoEncoder::~FFmpegVideoEncoder()
@@ -68,7 +68,7 @@ void FFmpegVideoEncoder::WriteFrame(const unsigned char* buffer)
         // build the ffmpeg command line
         _snprintf_s(temp, sizeof(temp) / sizeof(*temp),
             "\"%s\" -y -f rawvideo -pix_fmt bgr24 -s %dx%d -r %f %s -i - %s \"%s.mp4\"",
-            x264ExePath, xRes, yRes, (float)fpsNum/fpsDenom, in_opts, out_opts, prefix);
+            ffmpegExePath, xRes, yRes, (float)fpsNum/fpsDenom, in_opts, out_opts, prefix);
         printLog("ffmpeg: command line: %s\n", temp);
         WriteFile(hLogFile, (LPCVOID)&temp[0], (DWORD)strlen(temp), &dwDummy, NULL);
         WriteFile(hLogFile, (LPCVOID)&eol[0], 2, &dwDummy, NULL);

@@ -10,7 +10,7 @@ class FFmpegVideoEncoder : public BMPVideoEncoder
 	int fpsNum, fpsDenom;
 	char in_opts[256];
 	char out_opts[256];
-	char x264ExePath[MAX_PATH];
+	char ffmpegExePath[MAX_PATH];
 
 	HANDLE hProcess;
 	HANDLE hStream;
