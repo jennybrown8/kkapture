@@ -527,12 +527,20 @@ static INT_PTR CALLBACK MainDialogProc(HWND hWndDlg,UINT uMsg,WPARAM wParam,LPAR
       if(HIWORD(wParam) == CBN_SELCHANGE)
       {
         EncoderType enc = (EncoderType)(SendDlgItemMessage(hWndDlg,IDC_ENCODER,CB_GETCURSEL,0,0) + 1);
-        BOOL allowCodecSelect = (enc != BMPEncoder) && (enc != X264Encoder);
+
+        BOOL allowCodecSelect = enc == AVIEncoderVFW || enc == AVIEncoderDShow;
         EnableDlgItem(hWndDlg,IDC_VIDEOCODEC,allowCodecSelect);
         EnableDlgItem(hWndDlg,IDC_VCPICK,allowCodecSelect);
+
         allowCodecSelect = (enc == X264Encoder);
         EnableDlgItem(hWndDlg,IDC_X264LABEL,allowCodecSelect);
         EnableDlgItem(hWndDlg,IDC_X264OPTS,allowCodecSelect);
+
+        allowCodecSelect = (enc == FFmpegEncoder);
+        EnableDlgItem(hWndDlg,IDC_FFMPEGINLABEL,allowCodecSelect);
+        EnableDlgItem(hWndDlg,IDC_FFMPEGINOPTS,allowCodecSelect);
+        EnableDlgItem(hWndDlg,IDC_FFMPEGOUTLABEL,allowCodecSelect);
+        EnableDlgItem(hWndDlg,IDC_FFMPEGOUTOPTS,allowCodecSelect);
       }
       return TRUE;
 
