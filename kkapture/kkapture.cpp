@@ -130,7 +130,7 @@ static void LoadSettingsFromRegistry()
   Params.EnableAutoSkip = RegQueryDWord(hk,_T("EnableAutoSkip"),0);
   Params.FirstFrameTimeout = RegQueryDWord(hk,_T("FirstFrameTimeout"),1000);
   Params.FrameTimeout = RegQueryDWord(hk,_T("FrameTimeout"),500);
-  Params.UseEncoderThread = RegQueryDWord(hk,_T("UseEncoderThread"),0);
+  Params.UseEncoderThread = RegQueryDWord(hk,_T("UseEncoderThread"),1);
   Params.EnableGDICapture = RegQueryDWord(hk,_T("EnableGDICapture"),0);
   Params.FrequentTimerCheck = RegQueryDWord(hk,_T("FrequentTimerCheck"),1);
   Params.VirtualFramebuffer = RegQueryDWord(hk,_T("VirtualFramebuffer"),0);
