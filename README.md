@@ -47,3 +47,9 @@ Drag and drop the avi file onto the `tools/convert_264vfw_avi_to_mp4.bat` can co
 Latest release: https://github.com/DemoJameson/kkapture/releases
 
 Older versions: http://www.farbrausch.de/~fg/kkapture
+
+## For kkapture Developers
+
+Use MS Visual Studio 2022, bring in the git repository, open the sln solution file (this is a project wrapper),
+and then use Build > Build Solution.  It'll show the output directory, usually Debug.  The dll builds first 
+and then the executable builds after.
