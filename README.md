@@ -53,3 +53,12 @@ Older versions: http://www.farbrausch.de/~fg/kkapture
 Use MS Visual Studio 2022, bring in the git repository, open the sln solution file (this is a project wrapper),
 and then use Build > Build Solution.  It'll show the output directory, usually Debug.  The dll builds first 
 and then the executable builds after.
+
+## Fork Ancestry
+
+Originally created at https://github.com/rygorous/kkapture - last update 5 years ago
+
+Further updated and modernized at https://github.com/DemoJameson/kkapture - last update Oct 2022
+
+Then customized to use 9-character filename number padding at https://github.com/jennybrown8/kkapture - last update Feb 2023
+
