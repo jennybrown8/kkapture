@@ -73,6 +73,9 @@ static bool grabFrameD3D10(IDXGISwapChain *swap)
 
   if(captureTex && SUCCEEDED(captureTex->Map(0,D3D10_MAP_READ,0,&mapped)))
   {
+    if (ALWAYS_LOG_PIXEL_FORMAT == 1) {
+        printLog("video/d3d10: Backbuffer format %d\n", desc.Format);
+    }
     switch(desc.Format)
     {
     case DXGI_FORMAT_R8G8B8A8_UNORM:
@@ -81,7 +84,7 @@ static bool grabFrameD3D10(IDXGISwapChain *swap)
       break;
 
     default:
-      printLog("video/d3d10: unsupported backbuffer format, can't grab pixels!\n");
+      printLog("video/d3d10: unsupported backbuffer format %3d, can't grab pixels!\n", desc.Format);
       break;
     }
 
@@ -135,15 +138,27 @@ static bool grabFrameD3D11(IDXGISwapChain *swap)
 
   if(captureTex && SUCCEEDED(context->Map(captureTex,0,D3D11_MAP_READ,0,&mapped)))
   {
+	if (ALWAYS_LOG_PIXEL_FORMAT == 1) {
+		printLog("video/d3d11: Backbuffer format %d\n", desc.Format);
+	}
+
     switch(desc.Format)
     {
     case DXGI_FORMAT_R8G8B8A8_UNORM:
       blitAndFlipRGBAToCaptureData((unsigned char *) mapped.pData,mapped.RowPitch);
       grabOk = true;
       break;
-
+    case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
+      blitAndFlipRGBAToCaptureData((unsigned char*)mapped.pData, mapped.RowPitch);
+      grabOk = true;
+      break;
     default:
-      printLog("video/d3d11: unsupported backbuffer format, can't grab pixels!\n");
+      char message[200];
+//      sprintf(message, "video/d3d11: unsupported backbuffer format %3d, can't grab pixels! Attempting to grab blindly anyway.\n", desc.Format);
+      sprintf(message, "video/d3d11: unsupported backbuffer format %3d, can't grab pixels!\n", desc.Format);
+      printLog(message);
+//      blitAndFlipRGBAToCaptureData((unsigned char*)mapped.pData, mapped.RowPitch);
+//      grabOk = true;
       break;
     }
 

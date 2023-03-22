@@ -47,6 +47,7 @@ static const int PARAMVERSION = 7;
 #define ENCODER_OPTS_LENGTH 256
 #define MAX_ARGS _MAX_PATH * 2
 
+
 enum EncoderType
 {
   DummyEncoder,

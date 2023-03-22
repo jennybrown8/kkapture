@@ -50,11 +50,13 @@ static void fixPresentParameters(D3DPRESENT_PARAMETERS *pp)
 
   // force back buffer format to something we can read
   D3DFORMAT fmt = pp->BackBufferFormat;
+  printLog("video/d3d8: Started as backbuffer format %d\n", pp->BackBufferFormat);
   if(fmt == D3DFMT_A1R5G5B5 || fmt == D3DFMT_A8R8G8B8)
     pp->BackBufferFormat = D3DFMT_A8R8G8B8;
   else
     pp->BackBufferFormat = D3DFMT_X8R8G8B8;
-  
+  printLog("video/d3d8: Used backbuffer format %d\n", pp->BackBufferFormat);
+
   pp->FullScreen_PresentationInterval = 0;
 }
 

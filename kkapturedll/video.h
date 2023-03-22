@@ -23,6 +23,10 @@
 #ifndef __VIDEO_H__
 #define __VIDEO_H__
 
+// whether to noisily log the pixel format while grabbing; intended for use with prods that switch in the middle.
+constexpr auto ALWAYS_LOG_PIXEL_FORMAT = 1;
+
+
 class VideoEncoder;
 
 class VideoCaptureDataLock

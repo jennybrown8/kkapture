@@ -1,3 +1,7 @@
+version 1.05-wip (@jennybrown):
+* support 9-character padding on filename numbering, to support longer prods
+* always print backbuffer format, used for handling video encoding details later
+
 version 1.04:
 * add FFmpeg encoder support NVENC (thanks @EnderHane)
 

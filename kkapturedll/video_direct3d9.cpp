@@ -45,22 +45,26 @@ static bool firstCreate;
 
 static void fixPresentParameters(D3DPRESENT_PARAMETERS *pp)
 {
-	pp->BackBufferCount = 1;
+  pp->BackBufferCount = 1;
 
   if(pp->MultiSampleType == D3DMULTISAMPLE_NONE)
   {
-		pp->SwapEffect = D3DSWAPEFFECT_COPY;
-    multiSampleMode = false;
+	  pp->SwapEffect = D3DSWAPEFFECT_COPY;
+	  multiSampleMode = false;
   }
-  else
-    multiSampleMode = true;
+  else 
+  {
+      multiSampleMode = true;
+  }
 
-	// force back buffer format to something we can read
-	D3DFORMAT fmt = pp->BackBufferFormat;
-	if(fmt == D3DFMT_A2R10G10B10 || fmt == D3DFMT_A1R5G5B5 || fmt == D3DFMT_A8R8G8B8)
-		pp->BackBufferFormat = D3DFMT_A8R8G8B8;
-	else
-		pp->BackBufferFormat = D3DFMT_X8R8G8B8;
+  // force back buffer format to something we can read
+  D3DFORMAT fmt = pp->BackBufferFormat;
+  printLog("video/d3d9: Started as backbuffer format %d\n", pp->BackBufferFormat);
+  if (fmt == D3DFMT_A2R10G10B10 || fmt == D3DFMT_A1R5G5B5 || fmt == D3DFMT_A8R8G8B8)
+	  pp->BackBufferFormat = D3DFMT_A8R8G8B8;
+  else
+	  pp->BackBufferFormat = D3DFMT_X8R8G8B8;
+  printLog("video/d3d9: Used backbuffer format %d\n", pp->BackBufferFormat);
 
   pp->PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 }
@@ -253,6 +257,7 @@ static HRESULT __stdcall Mine_D3D9_CreateDevice(IDirect3D9 *d3d,UINT a0,UINT a1,
 
     setCaptureResolution(a4->BackBufferWidth,a4->BackBufferHeight);
     createCaptureSurfaces(dev,a4->BackBufferFormat);
+    printLog("video/d3d9: BackBuffer format %d\n", a4->BackBufferFormat);
 
     deviceRefCount = 1;
 
